@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { api } from "../api/Api";
+import usePagination from "../hooks/usePagination";
 import { Article } from "./Article/Article";
 import { Pagination } from "./Pagination/Pagination";
-
+import { Preloader } from "./Preloader/Preloader";
 export interface IdataType {
   id: string;
   createdAt: string;
@@ -12,24 +13,59 @@ export interface IdataType {
   description: string;
 }
 
-export const ArticlesList = () => {
+export const ArticlesList: FC = () => {
   const [article, setArticle] = useState<Array<IdataType>>([]);
+  const [loading, setLoading] = useState<Boolean>(false);
 
-  const getList = async () => {
-    const res = await api.getArticle();
-    setArticle(() => res);
-  };
+  const {
+    firstContentIndex,
+    lastContentIndex,
+    nextPage,
+    prevPage,
+    page,
+    setPage,
+    totalPages,
+  } = usePagination({
+    contentPerPage: 10,
+    count: article.length,
+  });
 
   useEffect(() => {
-    getList();
+    setLoading(true);
+    api
+      .getArticle()
+      .then((res) => {
+        setArticle(() => res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   return (
     <>
-      {article.map((item) => {
-        return <Article key={item.id} {...item} />;
-      })}
-      <Pagination />
+      {loading ? (
+        <Preloader />
+      ) : (
+        <>
+          <div className="items flex flex-wrap gap-20 justify-center">
+            {article
+              .slice(firstContentIndex, lastContentIndex)
+              .map((el: any) => (
+                <Article key={el.id} {...el} />
+              ))}
+          </div>
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            setPage={setPage}
+            nextPage={nextPage}
+            prevPage={prevPage}
+          />
+        </>
+      )}
     </>
   );
 };

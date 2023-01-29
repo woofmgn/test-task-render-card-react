@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import img from "../../img/photonotfound.jpg";
 
 type ArticleProps = {
   id: string;
@@ -12,34 +14,27 @@ type ArticleProps = {
 export const Article = (props: ArticleProps) => {
   const { createdAt, title, preview, image, id } = props;
 
+  const [imgSrc, setImgSrc] = useState<string | undefined>(image);
+
+  const changeImg = () => {
+    setImgSrc(img);
+  };
+
   return (
-    <article className="flex flex-col shadow my-4">
-      <a href="!#" className="hover:opacity-75">
-        <img
-          src={image}
-          onError={(event: any) =>
-            event.target.setAttribute(
-              "src",
-              "http://placeimg.com/640/480/fashion"
-            )
-          }
-          alt="Статья, превью фотографии"
-        />
-      </a>
+    <article className="md:w-1/4 w-300 h-400 flex flex-col shadow my-4 ">
+      <img
+        className="w-full"
+        src={imgSrc}
+        onError={changeImg}
+        alt="Статья, превью фотографии"
+      />
       <div className="bg-white flex flex-col justify-start p-6">
-        <a href="!#" className="text-3xl font-bold hover:text-gray-700 pb-4">
-          {title}
-        </a>
+        <h2 className="text-3xl font-bold hover:text-gray-700 pb-4">{title}</h2>
         <p className="text-sm pb-3">
-          By{" "}
-          <a href="!#" className="font-semibold hover:text-gray-800">
-            David Grzyb
-          </a>
-          , {createdAt}
+          <span className="font-semibold hover:text-gray-800">Created By</span>,{" "}
+          {createdAt}
         </p>
-        <a href="!#" className="pb-6">
-          {preview}
-        </a>
+        <p className="pb-6">{preview}</p>
         <Link
           to={`/posts/${id}`}
           className="uppercase text-gray-800 hover:text-black"
