@@ -1,8 +1,9 @@
 import { FC, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../../api/Api";
-import { IdataType } from "../../components/ArticlesList";
+import { IdataType } from "../../components/ArticlesList/ArticlesList";
 import { Preloader } from "../../components/Preloader/Preloader";
+import { useDate } from "../../hooks/useDate";
 import img from "../../img/photonotfound.jpg";
 
 export const Post: FC = () => {
@@ -10,17 +11,20 @@ export const Post: FC = () => {
   const [loading, setLoading] = useState<Boolean>(false);
   let { postId } = useParams();
 
+  const { normalizePostDate } = useDate();
+
   useEffect(() => {
     if (postId) {
       setLoading(true);
       api
         .getPost(postId)
         .then((res) => {
-          setPost(res);
+          setPost(normalizePostDate(res));
         })
         .catch((err) => console.log(err))
         .finally(() => setLoading(false));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postId]);
   return (
     <>

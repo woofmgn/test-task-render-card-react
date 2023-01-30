@@ -1,9 +1,10 @@
 import { FC, useEffect, useState } from "react";
-import { api } from "../api/Api";
-import usePagination from "../hooks/usePagination";
-import { Article } from "./Article/Article";
-import { Pagination } from "./Pagination/Pagination";
-import { Preloader } from "./Preloader/Preloader";
+import { api } from "../../api/Api";
+import { useDate } from "../../hooks/useDate";
+import usePagination from "../../hooks/usePagination";
+import { Article } from "../Article/Article";
+import { Pagination } from "../Pagination/Pagination";
+import { Preloader } from "../Preloader/Preloader";
 export interface IdataType {
   id: string;
   createdAt: string;
@@ -30,17 +31,20 @@ export const ArticlesList: FC = () => {
     count: article.length,
   });
 
+  const { normalizeDate } = useDate();
+
   useEffect(() => {
     setLoading(true);
     api
       .getArticle()
       .then((res) => {
-        setArticle(() => res);
+        setArticle(normalizeDate(res));
       })
       .catch((err) => console.log(err))
       .finally(() => {
         setLoading(false);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
